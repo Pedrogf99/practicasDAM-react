@@ -1,0 +1,54 @@
+[33mcommit e2f6a02fc7e8f237a451da0548ff61e79ea31ca8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfrontendReact[m[33m)[m
+Author: Pedro <pedrovera109@hotmail.com>
+Date:   Tue Apr 28 08:49:53 2026 +0200
+
+    Creación Login y ccreación página CV
+
+[33mcommit df0d6337fab547c7dab402f8c6fc53b67494e903[m[33m ([m[1;31mequipo/frontendReact[m[33m)[m
+Merge: b7e1661 46eaa3d
+Author: Pedro <pedrovera109@hotmail.com>
+Date:   Mon Apr 27 12:30:07 2026 +0200
+
+    Resuelto problema de historias de README
+
+[33mcommit b7e1661d780234ba47ffbd7824df870b6fabac9e[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m
+Author: Pedro <pedrovera109@hotmail.com>
+Date:   Mon Apr 27 12:10:10 2026 +0200
+
+    creacion de la app react
+
+[33mcommit 46eaa3d6eda489d94995d563f09cbc103225908c[m[33m ([m[1;31mequipo/main[m[33m)[m
+Merge: 5789058 3319f0b
+Author: JuanCaballeroHervás <juancaballerohervas11@gmail.com>
+Date:   Mon Apr 27 12:01:09 2026 +0200
+
+    Merge pull request #2 from juancaballerohervas11-crypto/docs/normas-equipo
+    
+    docs: añadir normas de contribución para el equipo
+
+[33mcommit 3319f0bea9b48a19e0ec0a6a65886fdc70c4b769[m
+Author: Juan Caballero Hervás <juancaballerohervas11@gmail.com>
+Date:   Mon Apr 27 12:00:04 2026 +0200
+
+    docs: añadir normas de contribución para el equipo
+
+[33mcommit 5789058b9791769e24361f0c50f6b5af246054c0[m
+Merge: 76f3d2a c2184cf
+Author: JuanCaballeroHervás <juancaballerohervas11@gmail.com>
+Date:   Mon Apr 27 11:04:09 2026 +0200
+
+    Merge pull request #1 from juancaballerohervas11-crypto/tarea/estructura-inicial
+    
+    Estructura inicial del proyecto
+
+[33mcommit c2184cf694db19f86f064161b158457d9a185b8d[m
+Author: Juan Caballero Hervás <juancaballerohervas11@gmail.com>
+Date:   Mon Apr 27 10:58:20 2026 +0200
+
+    Crear carpetas para la estructura del proyecto
+
+[33mcommit 76f3d2ac616222fd93b6a610ccad5f0be4325f7f[m
+Author: JuanCaballeroHervás <juancaballerohervas11@gmail.com>
+Date:   Mon Apr 27 10:15:49 2026 +0200
+
+    Initial commit
