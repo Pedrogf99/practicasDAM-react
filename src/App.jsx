@@ -20,19 +20,24 @@ function App() {
             {/* 2. Ruta Alumno: Solo si hay token Y el rol es 'alumno' */}
             <Route 
               path="/alumno" 
-              element={getToken() && getRol() === 'alumno' ? <DashboardAlumno /> : <Navigate to="/login" />} 
+              element={<DashboardAlumno />}
+              
+              //element={getToken() && getRol() === 'alumno' ? <DashboardAlumno /> : <Navigate to="/login" />} 
             />
 
             {/* 3. Ruta Profesor: Solo si hay token Y el rol es 'profesor' */}
             <Route 
               path="/profesor" 
-              element={getToken() && getRol() === 'profesor' ? <DashboardProfesor /> : <Navigate to="/login" />} 
+              element={<DashboardProfesor />}
+
+              //element={getToken() && getRol() === 'profesor' ? <DashboardProfesor /> : <Navigate to="/login" />} 
             />
 
             {/* 4. Ruta Admin: Solo si hay token Y el rol es 'admin' */}
             <Route 
               path="/admin" 
-              element={getToken() && getRol() === 'admin' ? <DashboardAdmin /> : <Navigate to="/login" />} 
+              element={<DashboardAdmin />}
+              //element={getToken() && getRol() === 'admin' ? <DashboardAdmin /> : <Navigate to="/login" />} 
             />
 
             {/* 5. Si no coincide nada, al login */}

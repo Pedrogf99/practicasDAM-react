@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Navbar from '../componentes/Navbar';
 
 function DashboardAlumno() {
   const [archivo, setArchivo] = useState(null);
@@ -23,31 +24,33 @@ function DashboardAlumno() {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>Panel del Alumno</h2>
-      <p>Bienvenido. Gestiona aquí tu currículum para las prácticas.</p>
+    <>
+      <Navbar /> {/* <--- ¡Faltaba poner esto aquí! */}
       
-      <div style={{ marginTop: '20px', border: '1px solid #ccc', padding: '20px', borderRadius: '8px' }}>
-        <h4>Estado: {archivo ? 'Listo para subir' : 'Pendiente de entrega'}</h4>
+      <div style={{ padding: '20px' }}>
+        <h2>Panel del Alumno</h2>
+        <p>Bienvenido. Gestiona aquí tu currículum para las prácticas.</p>
         
-        {/* Input de tipo file (el que realmente abre la ventana del PC) */}
-        <input 
-          type="file" 
-          accept=".pdf" 
-          onChange={manejarCambioArchivo} 
-          style={{ marginBottom: '10px' }}
-        />
-        <br />
-        
-        {/* Botón que ejecuta la acción */}
-        <button 
-          onClick={subirCV}
-          style={{ padding: '10px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer' }}
-        >
-          Enviar Currículum
-        </button>
+        <div style={{ marginTop: '20px', border: '1px solid #ccc', padding: '20px', borderRadius: '8px' }}>
+          <h4>Estado: {archivo ? 'Listo para subir' : 'Pendiente de entrega'}</h4>
+          
+          <input 
+            type="file" 
+            accept=".pdf" 
+            onChange={manejarCambioArchivo} 
+            style={{ marginBottom: '10px' }}
+          />
+          <br />
+          
+          <button 
+            onClick={subirCV}
+            style={{ padding: '10px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer' }}
+          >
+            Enviar Currículum
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
