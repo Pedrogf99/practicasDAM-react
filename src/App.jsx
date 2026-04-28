@@ -1,38 +1,47 @@
-import { useState } from 'react';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './vistas/Login';
-import DashboardAlumno from './componentes/DashboardAlumno';
+import DashboardAlumno from './vistas/DashboardAlumno';
+import DashboardProfesor from './vistas/DashboardProfesor'; // Debes crear este archivo
+import DashboardAdmin from './vistas/DashboardAdmin';       // Debes crear este archivo
+import { getToken, getRol } from './servicios/Autenticacion';
 
 function App() {
-  // 1. Esta es la "llave" que dice si el alumno ha entrado o no
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   return (
-    <div className="App">
-      <header style={{ padding: '20px', textAlign: 'center', backgroundColor: '#282c34', color: 'white' }}>
-        <h1>Gestor FFEOE - Proyecto Pedro</h1>
-      </header>
+    <Router>
+      <div className="App">
+        <header style={{ padding: '20px', textAlign: 'center', backgroundColor: '#282c34', color: 'white' }}>
+          <h1>Gestor FFEOE - Proyecto Pedro</h1>
+        </header>
 
-      <main style={{ padding: '20px' }}>
-        {/* Lógica condicional: */}
-        {!isLoggedIn ? (
-          /* Si NO está logueado, le enseñamos el Login */
-          <Login onLoginSuccess={() => setIsLoggedIn(true)} />
-        ) : (
-          /* Si YA está logueado, le enseñamos su Dashboard y el botón de salir */
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-               <h2>Bienvenido, Alumno</h2>
-               <button onClick={() => setIsLoggedIn(false)} style={{ backgroundColor: 'red', color: 'white' }}>
-                 Cerrar Sesión
-               </button>
-            </div>
-            
-            <DashboardAlumno />
-          </div>
-        )}
-      </main>
-    </div>
+        <main style={{ padding: '20px' }}>
+          <Routes>
+            {/* 1. Login siempre accesible */}
+            <Route path="/login" element={<Login />} />
+
+            {/* 2. Ruta Alumno: Solo si hay token Y el rol es 'alumno' */}
+            <Route 
+              path="/alumno" 
+              element={getToken() && getRol() === 'alumno' ? <DashboardAlumno /> : <Navigate to="/login" />} 
+            />
+
+            {/* 3. Ruta Profesor: Solo si hay token Y el rol es 'profesor' */}
+            <Route 
+              path="/profesor" 
+              element={getToken() && getRol() === 'profesor' ? <DashboardProfesor /> : <Navigate to="/login" />} 
+            />
+
+            {/* 4. Ruta Admin: Solo si hay token Y el rol es 'admin' */}
+            <Route 
+              path="/admin" 
+              element={getToken() && getRol() === 'admin' ? <DashboardAdmin /> : <Navigate to="/login" />} 
+            />
+
+            {/* 5. Si no coincide nada, al login */}
+            <Route path="*" element={<Navigate to="/login" />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
 

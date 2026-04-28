@@ -1,11 +1,11 @@
-export const saveToken = (token) => {
-  localStorage.setItem('token_gestor', token);
+export const saveRol = (rol) => {
+  localStorage.setItem('user_rol', rol);
 };
 
-export const getToken = () => {
-  return localStorage.getItem('token_gestor');
+export const getRol = () => {
+  return localStorage.getItem('user_rol');
 };
 
-export const removeToken = () => {
-  localStorage.removeItem('token_gestor');
+export const removeRol = () => {
+  localStorage.removeItem('user_rol');
 };

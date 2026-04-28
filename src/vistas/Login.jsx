@@ -64,8 +64,9 @@ const manejarEnvio = async (e) => {
 
       if (respuesta.ok) {
         // SI TODO HA IDO BIEN:
-        saveToken(datos.token); // Guardamos el Ticket Dorado real
-        props.onLoginSuccess(); // Cambiamos a la pantalla de Dashboard
+        saveToken(datos.token);
+        saveRol(datos.rol); 
+        props.onLoginSuccess(); 
       } else {
         // SI EL BACKEND DICE QUE NO:
         alert("Error: " + datos.mensaje); // "Usuario no encontrado" o "Clave mal"
