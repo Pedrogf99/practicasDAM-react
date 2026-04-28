@@ -1,13 +1,20 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function Navbar() {
   const navigate = useNavigate();
-  const rol = localStorage.getItem('user_rol'); // Leemos quién es el usuario
+  const location = useLocation(); // Esto detecta cuando cambias de URL
+  const [rol, setRol] = useState(localStorage.getItem('user_rol'));
+
+  // Cada vez que cambies de página (URL), la Navbar volverá a mirar el localStorage
+  useEffect(() => {
+    const rolActual = localStorage.getItem('user_rol');
+    setRol(rolActual);
+  }, [location]); 
 
   const cerrarSesion = () => {
-    localStorage.clear(); // Borramos token y rol
-    navigate('/login');   // ¡A la calle!
+    localStorage.clear();
+    navigate('/login');
   };
 
   return (
@@ -21,11 +28,10 @@ function Navbar() {
       marginBottom: '20px'
     }}>
       <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
-        🚀 Gestor FCT <span style={{fontSize: '0.8rem', color: '#61dafb'}}>| {rol?.toUpperCase()}</span>
+        🚀 Gestor FCT <span style={{fontSize: '0.8rem', color: '#61dafb'}}>| {rol?.toUpperCase() || 'INVITADO'}</span>
       </div>
 
       <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-        {/* Enlaces dinámicos según el rol */}
         {rol === 'alumno' && <span>Mi CV</span>}
         {rol === 'profesor' && <span>Gestión Alumnos</span>}
         {rol === 'admin' && <span>Configuración Sistema</span>}

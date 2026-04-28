@@ -1,7 +1,11 @@
-import React from 'react';
 import Navbar from '../componentes/Navbar';
+import React, { useEffect, useState } from 'react';
 
 function DashboardAdmin() {
+    useEffect(() => {
+    localStorage.setItem('user_rol', 'admin');
+    window.dispatchEvent(new Event("storage"));
+  }, []);
   // Datos de prueba para el Admin
   const ciclos = [
     { id: 1, nombre: "DAM", familia: "Informática", alumnos: 25 },
