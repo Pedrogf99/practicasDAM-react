@@ -43,8 +43,8 @@ function Login() {
       
       // BORRA ESTO cuando tus compañeros tengan el backend listo:
       saveToken("token_falso_prueba");
-      saveRol("alumno"); // Prueba a cambiar esto por 'profesor' para ver si cambia la vista
-      navigate('/alumno');
+      saveRol("admin"); // Prueba a cambiar esto por 'profesor' para ver si cambia la vista
+      navigate('/admin');
     }
   };
 

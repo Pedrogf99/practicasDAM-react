@@ -1,16 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './vistas/Login';
-import DashboardAlumno from './vistas/DashboardAlumno';
-import DashboardProfesor from './vistas/DashboardProfesor'; // Debes crear este archivo
-import DashboardAdmin from './vistas/DashboardAdmin';       // Debes crear este archivo
+import Login from "./vistas/Login.jsx";
+import DashboardAlumno from "./vistas/DashboardAlumno.jsx";
+import DashboardProfesor from "./vistas/DashboardProfesor.jsx";
+import DashboardAdmin from "./vistas/DashboardAdmin.jsx";
 import { getToken, getRol } from './servicios/Autenticacion';
-
 function App() {
   return (
     <Router>
       <div className="App">
         <header style={{ padding: '20px', textAlign: 'center', backgroundColor: '#282c34', color: 'white' }}>
-          <h1>Gestor FFEOE - Proyecto Pedro</h1>
+          <h1>Gestor FFEOE</h1>
         </header>
 
         <main style={{ padding: '20px' }}>
