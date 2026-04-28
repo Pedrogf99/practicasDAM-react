@@ -1,78 +1,81 @@
 import { useState } from 'react';
-import { saveToken } from '../servicios/Autenticacion';
+import { useNavigate } from 'react-router-dom'; // Para saltar de una página a otra
+import { saveToken, saveRol } from '../servicios/Autenticacion';
 
-function Login(props) {
-  // Creamos las "cajas" para guardar el email y la contraseña
+function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // Creamos el "navegador" interno
 
-  const manejarEnvio = (e) => {
-    e.preventDefault();    
-    props.onLoginSuccess();// Evita que la página se recargue sola
-    
-    // De momento, como no hay Backend, simulamos que todo va bien
-    console.log("Enviando datos:", email, password);
-    
-    const tokenFalso = "12345_token_de_prueba"; 
-    saveToken(tokenFalso); // Guardamos el "sello" en tu billetera (authService)
-    
-    alert("¡Has iniciado sesión! El token se ha guardado.");
+  const manejarEnvio = async (e) => {
+    e.preventDefault();
+
+    // 1. Conexión con el Backend
+    try {
+      const respuesta = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          email: email, 
+          password: password 
+        })
+      });
+
+      const datos = await respuesta.json();
+
+      if (respuesta.ok) {
+        // SI TODO VA BIEN:
+        saveToken(datos.token); // Guardamos el JWT
+        saveRol(datos.rol);     // Guardamos si es 'alumno', 'profesor' o 'admin'
+        
+        // 2. Redirección automática según el rol
+        // Si el rol es 'alumno', navega a /alumno. Si es 'profesor', a /profesor...
+        navigate('/' + datos.rol); 
+
+      } else {
+        alert("Error: " + datos.mensaje);
+      }
+    } catch (error) {
+      // Si el backend no responde, simulamos para que puedas seguir trabajando
+      console.log("Error de conexión. Usando modo simulación.");
+      
+      // BORRA ESTO cuando tus compañeros tengan el backend listo:
+      saveToken("token_falso_prueba");
+      saveRol("alumno"); // Prueba a cambiar esto por 'profesor' para ver si cambia la vista
+      navigate('/alumno');
+    }
   };
 
   return (
-    <div style={{ padding: '20px', border: '1px solid black' }}>
+    <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto', border: '1px solid #ccc', borderRadius: '8px' }}>
       <h2>Iniciar Sesión</h2>
       <form onSubmit={manejarEnvio}>
-        <input 
-          type="email" 
-          placeholder="Tu correo" 
-          onChange={(e) => setEmail(e.target.value)} // Cada vez que escribes, se guarda en la "caja" email
-        />
-        <br /><br />
-        <input 
-          type="password" 
-          placeholder="Tu contraseña" 
-          onChange={(e) => setPassword(e.target.value)} // Se guarda en la "caja" password
-        />
-        <br /><br />
-        <button type="submit">Entrar</button>
+        <div style={{ marginBottom: '10px' }}>
+          <label>Email:</label><br />
+          <input 
+            type="email" 
+            required
+            style={{ width: '100%' }}
+            onChange={(e) => setEmail(e.target.value)} 
+          />
+        </div>
+        <div style={{ marginBottom: '20px' }}>
+          <label>Contraseña:</label><br />
+          <input 
+            type="password" 
+            required
+            style={{ width: '100%' }}
+            onChange={(e) => setPassword(e.target.value)} 
+          />
+        </div>
+        <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#282c34', color: 'white', border: 'none', cursor: 'pointer' }}>
+          Entrar
+        </button>
       </form>
     </div>
   );
 }
 
 export default Login;
-const manejarEnvio = async (e) => {
-    e.preventDefault();
-
-    // 1. "Llamamos" al Backend por teléfono (la URL)
-    // Cambia 'http://localhost:3000/login' por la dirección que te dé tu compañero
-    try {
-      const respuesta = await fetch('http://localhost:3000/login', {
-        method: 'POST', // Decimos que vamos a ENVIAR datos
-        headers: {
-          'Content-Type': 'application/json' // Decimos que hablamos en idioma JSON
-        },
-        body: JSON.stringify({ 
-          email: email, 
-          password: password 
-        }) // Metemos el email y la clave en el sobre
-      });
-
-      // 2. Esperamos a que el Backend nos conteste
-      const datos = await respuesta.json();
-
-      if (respuesta.ok) {
-        // SI TODO HA IDO BIEN:
-        saveToken(datos.token);
-        saveRol(datos.rol); 
-        props.onLoginSuccess(); 
-      } else {
-        // SI EL BACKEND DICE QUE NO:
-        alert("Error: " + datos.mensaje); // "Usuario no encontrado" o "Clave mal"
-      }
-    } catch (error) {
-      // SI EL BACKEND ESTÁ APAGADO:
-      alert("No puedo conectar con el servidor. ¿Está encendido?");
-    }
-  };
