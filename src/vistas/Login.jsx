@@ -1,81 +1,171 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Para saltar de una página a otra
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { saveToken, saveRol } from '../servicios/Autenticacion';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // Creamos el "navegador" interno
+  const [cargando, setCargando] = useState(false);
+  const navigate = useNavigate();
 
   const manejarEnvio = async (e) => {
     e.preventDefault();
+    setCargando(true);
 
-    // 1. Conexión con el Backend
     try {
+      // 1. Intento de conexión REAL al Backend
       const respuesta = await fetch('http://localhost:3000/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 
-          email: email, 
-          password: password 
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
       });
 
       const datos = await respuesta.json();
 
       if (respuesta.ok) {
-        // SI TODO VA BIEN:
-        saveToken(datos.token); // Guardamos el JWT
-        saveRol(datos.rol);     // Guardamos si es 'alumno', 'profesor' o 'admin'
+        saveToken(datos.token);
+        saveRol(datos.rol);
+        localStorage.setItem('user_email', email);
         
-        // 2. Redirección automática según el rol
-        // Si el rol es 'alumno', navega a /alumno. Si es 'profesor', a /profesor...
-        navigate('/' + datos.rol); 
-
+        // Disparamos evento para que la Navbar se entere si está presente
+        window.dispatchEvent(new Event("storage"));
+        navigate('/' + datos.rol);
       } else {
         alert("Error: " + datos.mensaje);
       }
     } catch (error) {
-      // Si el backend no responde, simulamos para que puedas seguir trabajando
-      console.log("Error de conexión. Usando modo simulación.");
+      // 2. MODO SIMULACIÓN (Si el backend no responde)
+      console.warn("Backend no disponible. Entrando en modo simulación...");
       
-      // BORRA ESTO cuando tus compañeros tengan el backend listo:
-      saveToken("token_falso_prueba");
-      saveRol("alumno"); // Prueba a cambiar esto por 'profesor' para ver si cambia la vista
-      navigate('/alumno');
+      let rolSimulado = "alumno";
+      if (email.includes('profe')) rolSimulado = "profesor";
+      if (email.includes('admin')) rolSimulado = "admin";
+
+      saveToken("token_simulado_jwt");
+      saveRol(rolSimulado);
+      localStorage.setItem('user_email', email);
+      
+      window.dispatchEvent(new Event("storage"));
+      navigate('/' + rolSimulado);
+    } finally {
+      setCargando(false);
     }
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto', border: '1px solid #ccc', borderRadius: '8px' }}>
-      <h2>Iniciar Sesión</h2>
-      <form onSubmit={manejarEnvio}>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Email:</label><br />
-          <input 
-            type="email" 
-            required
-            style={{ width: '100%' }}
-            onChange={(e) => setEmail(e.target.value)} 
-          />
+    <div style={estiloPagina}>
+      <div style={estiloCajaLogin}>
+        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+          <span style={{ fontSize: '3rem' }}>🚀</span>
+          <h2 style={{ margin: '10px 0 5px 0', color: '#fff' }}>Gestor FFEOE</h2>
+          <p style={{ color: '#9ca3af', fontSize: '0.9rem' }}>Introduce tus credenciales para acceder</p>
         </div>
-        <div style={{ marginBottom: '20px' }}>
-          <label>Contraseña:</label><br />
-          <input 
-            type="password" 
-            required
-            style={{ width: '100%' }}
-            onChange={(e) => setPassword(e.target.value)} 
-          />
+
+        <form onSubmit={manejarEnvio}>
+          <div style={estiloGrupoInput}>
+            <label style={estiloLabel}>Correo Electrónico</label>
+            <input 
+              type="email" 
+              required
+              placeholder="ejemplo@alumno.com"
+              style={estiloInput}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)} 
+            />
+          </div>
+
+          <div style={estiloGrupoInput}>
+            <label style={estiloLabel}>Contraseña</label>
+            <input 
+              type="password" 
+              required
+              placeholder="••••••••"
+              style={estiloInput}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)} 
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={cargando}
+            style={{
+              ...estiloBoton,
+              backgroundColor: cargando ? '#4b5563' : '#3b82f6'
+            }}
+          >
+            {cargando ? 'Accediendo...' : 'Iniciar Sesión'}
+          </button>
+        </form>
+
+        <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '0.8rem', color: '#6b7280' }}>
+          <p>Usa un correo con "profe" para entrar como profesor en modo simulación.</p>
         </div>
-        <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#282c34', color: 'white', border: 'none', cursor: 'pointer' }}>
-          Entrar
-        </button>
-      </form>
+      </div>
     </div>
   );
 }
+
+// --- ESTILOS ---
+const estiloPagina = {
+  height: '100vh',
+  width: '100vw',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: '#111827', // Fondo oscuro que coincide con tu captura
+  margin: 0,
+  padding: 0,
+  position: 'fixed',
+  top: 0,
+  left: 0
+};
+
+const estiloCajaLogin = {
+  backgroundColor: '#1f2937',
+  padding: '40px',
+  borderRadius: '16px',
+  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3)',
+  width: '100%',
+  maxWidth: '400px',
+  border: '1px solid #374151'
+};
+
+const estiloGrupoInput = {
+  marginBottom: '20px'
+};
+
+const estiloLabel = {
+  display: 'block',
+  marginBottom: '8px',
+  fontSize: '0.875rem',
+  fontWeight: '500',
+  color: '#d1d5db'
+};
+
+const estiloInput = {
+  width: '100%',
+  padding: '12px',
+  borderRadius: '8px',
+  border: '1px solid #4b5563',
+  backgroundColor: '#374151',
+  color: '#fff',
+  fontSize: '1rem',
+  boxSizing: 'border-box',
+  outline: 'none'
+};
+
+const estiloBoton = {
+  width: '100%',
+  padding: '12px',
+  borderRadius: '8px',
+  border: 'none',
+  color: 'white',
+  fontSize: '1rem',
+  fontWeight: '600',
+  cursor: 'pointer',
+  transition: 'background-color 0.2s',
+  marginTop: '10px'
+};
 
 export default Login;
