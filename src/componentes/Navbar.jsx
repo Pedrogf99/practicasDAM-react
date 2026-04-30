@@ -1,21 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 
 function Navbar() {
   const navigate = useNavigate();
-  const location = useLocation(); // Esto detecta cuando cambias de URL
+  const location = useLocation();
   const [rol, setRol] = useState(localStorage.getItem('user_rol'));
 
-  // Cada vez que cambies de página (URL), la Navbar volverá a mirar el localStorage
+  // Actualiza el rol cada vez que cambias de página
   useEffect(() => {
-    const rolActual = localStorage.getItem('user_rol');
-    setRol(rolActual);
-  }, [location]); 
+    setRol(localStorage.getItem('user_rol'));
+  }, [location]);
+
+  // Escucha el evento que lanza el Login cuando guarda el rol
+  useEffect(() => {
+    const actualizarRol = () => setRol(localStorage.getItem('user_rol'));
+    window.addEventListener('storage', actualizarRol);
+    return () => window.removeEventListener('storage', actualizarRol);
+  }, []);
 
   const cerrarSesion = () => {
-    localStorage.clear();
-    navigate('/login');
+  localStorage.removeItem('token_gestor');
+  localStorage.removeItem('user_email');
+  localStorage.removeItem('user_rol');
+  localStorage.removeItem('user_nombre');
+  navigate('/login');
+};
+
+  // Enlaces por rol
+  const enlaces = {
+    alumno:   [{ path: '/alumno',   label: '📄 Mi Panel' }],
+    profesor: [{ path: '/profesor', label: '👥 Gestión Alumnos' },
+               { path: '/empresa',  label: '🏢 Empresas' }],
+    admin:    [{ path: '/admin',    label: '⚙️ Configuración' }],
   };
+
+  const linksActuales = enlaces[rol] || [];
 
   return (
     <nav style={{
@@ -27,16 +46,19 @@ function Navbar() {
       color: 'white',
       marginBottom: '20px'
     }}>
+      {/* Logo */}
       <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
-        🚀 Gestor FCT <span style={{fontSize: '0.8rem', color: '#61dafb'}}>| {rol?.toUpperCase() || 'INVITADO'}</span>
+        🚀 Gestor FCT{' '}
+        <span style={{ fontSize: '0.8rem', color: '#61dafb' }}>
+          | {rol?.toUpperCase() || 'INVITADO'}
+        </span>
       </div>
 
+      {/* Links + botón */}
       <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-        {rol === 'alumno' && <span>Mi CV</span>}
-        {rol === 'profesor' && <span>Gestión Alumnos</span>}
-        {rol === 'admin' && <span>Configuración Sistema</span>}
+      
 
-        <button 
+        <button
           onClick={cerrarSesion}
           style={{
             padding: '5px 10px',

@@ -109,3 +109,15 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+input[type="date"]:focus,
+input[type="time"]:focus {
+  border: 2px solid #41c543 !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(65, 197, 67, 0.2);
+}
+
+input[type="date"]:focus-within,
+input[type="time"]:focus-within {
+  border-color: #41c543;
+}

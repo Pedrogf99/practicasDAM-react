@@ -4,15 +4,15 @@ import Navbar from '../componentes/Navbar';
 function DashboardAlumno() {
   // --- 1. ESTADOS DEL PERFIL ---
   const [perfil, setPerfil] = useState(() => {
-    const guardado = localStorage.getItem('perfil_alumno');
-    return guardado ? JSON.parse(guardado) : {
-      nombre: 'Juan Pérez',
-      email: 'juan@alumno.com',
-      telefono: '',
-      direccion: '',
-      ciclo: 'DAM'
-    };
-  });
+  const guardado = localStorage.getItem('perfil_alumno');
+  return guardado ? JSON.parse(guardado) : {
+    nombre: localStorage.getItem('user_nombre') || '',  // ← viene del login
+    email: localStorage.getItem('user_email') || '',    // ← viene del login
+    telefono: '',
+    direccion: '',
+    ciclo: ''
+  };
+});
 
   const [editando, setEditando] = useState(false);
 
@@ -21,35 +21,41 @@ function DashboardAlumno() {
     estado: 'Pendiente',
     empresa: 'No asignada',
     tutorLaboral: 'No asignado',
+     tutorAcademico: 'No asignado',
     contactoTutor: ''
   });
 
   // --- 3. ESTADO DEL CV ---
   const [cvSubido, setCvSubido] = useState(localStorage.getItem(`cv_entregado_${perfil.email}`) === 'true');
   const [feedbackCV, setFeedbackCV] = useState(localStorage.getItem(`cv_estado_${perfil.email}`) || 'Pendiente de revisión');
+  const [mensaje, setMensaje] = useState('');
 
   useEffect(() => {
-    // Simulamos la carga de la asignación desde el "servidor" (localStorage)
-    const empresaAsignada = localStorage.getItem(`asignacion_empresa_${perfil.email}`);
-    const estadoCV = localStorage.getItem(`cv_estado_${perfil.email}`);
-
-    if (empresaAsignada) {
-      setDatosAsignacion({
-        estado: 'Asignado',
-        empresa: empresaAsignada,
-        tutorLaboral: 'Carlos Gómez', // En un caso real, esto vendría de la base de datos de la empresa
-        contactoTutor: 'carlos.gomez@empresa.com'
-      });
-    }
-    if (estadoCV) setFeedbackCV(estadoCV);
-  }, [perfil.email]);
+  // Usamos el email del login, no del perfil guardado
+  const emailActual = localStorage.getItem('user_email') || perfil.email;
+  const tutorLaboral = localStorage.getItem(`tutor_laboral_${emailActual}`);
+const tutorLaboralTel = localStorage.getItem(`tutor_laboral_tel_${emailActual}`);
+  const empresaAsignada = localStorage.getItem(`asignacion_empresa_${emailActual}`);
+  const tutorAcademico = localStorage.getItem(`tutor_academico_${emailActual}`);
+  const estadoCV = localStorage.getItem(`cv_estado_${emailActual}`);
+if (empresaAsignada) {
+  setDatosAsignacion({
+    estado: 'Pendiente',
+    empresa: 'No asignada',
+    tutorAcademico: tutorAcademico || 'No asignado',
+    tutorLaboral: tutorLaboral || 'Pendiente de asignar',
+    contactoTutor: tutorLaboralTel || ''
+    });
+  }
+  if (estadoCV) setFeedbackCV(estadoCV);
+}, [perfil.email]);
 
   // --- FUNCIONES ---
   const guardarPerfil = (e) => {
     e.preventDefault();
     localStorage.setItem('perfil_alumno', JSON.stringify(perfil));
     setEditando(false);
-    alert("Datos actualizados correctamente");
+    setMensaje("✅ Datos actualizados correctamente");
   };
 
   const manejarSubidaCV = (e) => {
@@ -57,9 +63,9 @@ function DashboardAlumno() {
     if (archivo && archivo.type === "application/pdf") {
       localStorage.setItem(`cv_entregado_${perfil.email}`, 'true');
       setCvSubido(true);
-      alert("Currículum PDF subido con éxito");
+      setMensaje("✅ Currículum subido con éxito");
     } else {
-      alert("Por favor, sube un archivo en formato PDF");
+      setMensaje("⚠️ Por favor, sube un archivo PDF");
     }
   };
 
@@ -68,7 +74,8 @@ function DashboardAlumno() {
       <Navbar />
       
       <div style={{ padding: '30px', maxWidth: '1000px', margin: '0 auto' }}>
-        <h1 style={{ color: '#1f2937' }}>Mi Panel de FCT</h1>
+        <h1 style={{ color: '#1f2937' }}>Mi Panel</h1>
+        {mensaje && <p style={{ color: '#166534', backgroundColor: '#dcfce7', padding: '10px', borderRadius: '8px' }}>{mensaje}</p>}
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px', marginTop: '20px' }}>
           
@@ -127,10 +134,11 @@ function DashboardAlumno() {
 
             <div style={{ marginTop: '20px' }}>
               <p><b>🏢 Empresa:</b> {datosAsignacion.empresa}</p>
-              <p><b>👨‍💼 Tutor Laboral:</b> {datosAsignacion.tutorLaboral}</p>
-              {datosAsignacion.estado === 'Asignado' && (
-                <p><b>📧 Contacto Tutor:</b> {datosAsignacion.contactoTutor}</p>
-              )}
+<p><b>🎓 Tutor Academico:</b> {datosAsignacion.tutorAcademico}</p>
+<p><b>👨‍💼 Tutor Laboral:</b> {datosAsignacion.tutorLaboral}</p>
+{datosAsignacion.contactoTutor && (
+  <p><b>📞 Tel. Tutor:</b> {datosAsignacion.contactoTutor}</p>)}
+              
             </div>
             
             <hr style={{ border: '0', borderTop: '1px solid #e5e7eb', margin: '20px 0' }} />
@@ -153,6 +161,14 @@ function DashboardAlumno() {
               onChange={manejarSubidaCV} 
               style={{ marginTop: '15px', fontSize: '0.8rem' }} 
             />
+            {cvSubido && (
+  <button 
+    onClick={() => { localStorage.removeItem(`cv_entregado_${perfil.email}`); setCvSubido(false); }}
+    style={{ marginTop: '8px', fontSize: '0.75rem', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}
+  >
+    🗑️ Eliminar CV y subir otro
+  </button>
+)}
           </section>
 
         </div>
@@ -192,9 +208,9 @@ const btnSecundario = {
 const estiloStatusCard = (estado) => ({
   padding: '10px 15px',
   borderRadius: '8px',
-  backgroundColor: estado === 'Asignado' ? '#dcfce7' : '#fef9c3',
-  color: estado === 'Asignado' ? '#166534' : '#854d0e',
-  border: estado === 'Asignado' ? '1px solid #bbf7d0' : '1px solid #fef08a'
+  backgroundColor: estado === 'Asignado' ? '#41c543' : '#fef9c3',
+  color: estado === 'Asignado' ? '#ffffff' : '#854d0e',
+  border: estado === 'Asignado' ? '1px solid #5e9b73' : '1px solid #fef08a'
 });
 
 export default DashboardAlumno;
